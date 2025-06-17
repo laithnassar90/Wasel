@@ -5,6 +5,18 @@
  * Copyright(c) 2014-2015 Douglas Christopher Wilson
  * MIT Licensed
  */
+const express = require('express');
+const app = express();
+
+const PORT = process.env.PORT || 10000;
+
+app.get('/', (req, res) => {
+  res.send('Wasel backend is live');
+});
+
+app.listen(PORT, () => {
+  console.log(`🚗 Wasel backend running at http://localhost:${PORT}`);
+});
 
 'use strict';
 
