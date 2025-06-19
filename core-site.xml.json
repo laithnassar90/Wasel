@@ -1,0 +1,9 @@
+ <property>
+      <name>hadoop.proxyuser.<loginuser>.hosts</name>
+      <value>*</value>
+ </property>
+ <property>
+      <name>hadoop.proxyuser.<loginuser>.groups</name>
+      <value>*</value>
+ </property>
+
