@@ -65,5 +65,8 @@
 	],
 	"volta": {
 		"extends": "../../package.json"
+	},
+	"dependencies": {
+		"express": "^5.1.0"
 	}
 }
