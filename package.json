@@ -2,16 +2,45 @@
   "name": "wasel-frontend",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "express": "^5.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^0.0.0"
-  },
+  "description": "Frontend application for Wasel. Built with React.",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  }
+    "eject": "react-scripts eject",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,scss,md}'"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laithnassar90/wasel-frontend.git"
+  },
+  "keywords": [
+    "react",
+    "frontend",
+    "wasel"
+  ],
+  "author": "laithnassar90",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/laithnassar90/wasel-frontend/issues"
+  },
+  "homepage": "https://github.com/laithnassar90/wasel-frontend#readme"
 }
