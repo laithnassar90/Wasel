@@ -1,4 +1,5 @@
 // filepath: c:\Users\USER\Wasel\routes\auth.js
+const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 
@@ -9,3 +10,4 @@ router.get('/', (req, res) => {
 });
 
 module.exports = router;
+

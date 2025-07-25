@@ -1,21 +1,39 @@
-const express = require("express");
-const router = express.Router();
+require('dotenv').config();
+const mongoose = require('mongoose');
 
-router.post("/register", (req, res) => {
-  const { name, email, password } = req.body;
-  res.status(201).json({ message: "User registered successfully" });
+const mongoUri = process.env.MONGO_URI;
+
+mongoose.connect(mongoUri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('DB error:', err));
+
+
+const express = require('express');
+
+const cors = require('cors');
+require('dotenv').config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Connect DB
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => console.log("MongoDB connected"))
+  .catch((err) => console.log("DB error: ", err));
+
+// Routes
+app.use('/api/trips', require('./routes/trips'));
+
+app.get('/', (req, res) => {
+  res.send("Wasel Backend API");
 });
 
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  res.json({ token: "mock-jwt-token" });
-});
-
-module.exports = router;
-
-
-
-
-
-
- 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

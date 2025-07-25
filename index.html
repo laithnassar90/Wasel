@@ -1,12 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Wasel Frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <!-- Vite loads your React app from here -->
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wasel App</title>
+  <link href="/styles.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useEffect, useState } = React;
+
+    // Backend API base URL (update with the port from backend console output)
+    const API_BASE_URL = 'http://localhost:5000'; // Replace with the port logged by backend (e.g., 3000)
+
+    const Ride = { id: String, location: String, destination: String, seats: Number, isZakaah: Boolean };
+    const FormData = { location: String, destination: String, seats: String, isZakaah: Boolean };
+    const SearchData = { location: String, destination: String };
+
+    const RideForm = ({ onSubmit, form, setForm, error }) => {
+      const handleSubmit = () => {
+        if (!form.location.trim() || !form.destination.trim() || !form.seats || parseInt(form.seats) < 1) {
+          return;
+        }
+        onSubmit();
+      };
+
+      return (
+        <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Post a Ride</h2>
+          {error && (
+            <p className="mb-4 text-red-600 font-semibold" role="alert">
+              {error}
+            </p>
+          )}
+          <input
+            placeholder="Location"
+            value={form.location}
+            onChange={e => setForm({ ...form, location: e.target.value })}
+            className="border border-gray-300 p-2 w-full mb-3 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Starting location"
+          />
+          <input
+            placeholder="Destination"
+            value={form.destination}
+            onChange={e => setForm({ ...form, destination: e.target.value })}
+            className="border border-gray-300 p-2 w-full mb-3 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="Destination"
+          />
+          <input
+            placeholder="Seats"
+            type="number"
+            value={form.seats}
+            onChange={e => setForm({ ...form, seats: e.target.value })}
+            className="border border-gray-300 p-2 w-full mb-3 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            min="1"
+            aria-label="Number of seats"
+          />
+          <label className="flex items-center mb-3">
+            <input
+              type="checkbox"
+              checked={form.isZakaah}
+              onChange={e => setForm({ ...form, isZakaah: e.target.checked })}
+              className="h-5 w-5 text-primary focus:ring-primary"
+            />
+            <span className="ml-2 text-gray-700">Zakaah Seat</span>
+          </label>
+          <button
+            onClick={handleSubmit}
+            className="bg-primary text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:bg-gray-400"
+            disabled={!form.location.trim() || !form.destination.trim() || !form.seats || parseInt(form.seats) < 1}
+          >
+            Post Ride
+          </button>
+        </div>
+      );
+    };
+
+    const SearchForm = ({ onSearch, search, setSearch }) => (
+      <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-lg font-semibold mb-4">Search Rides</h2>
+        <input
+          placeholder="Location"
+          value={search.location}
+          onChange={e => setSearch({ ...search, location: e.target.value })}
+          className="border border-gray-300 p-2 w-full mb-3 rounded focus:outline-none focus:ring-2 focus:ring-secondary"
+          aria-label="Search starting location"
+        />
+        <input
+          placeholder="Destination"
+          value={search.destination}
+          onChange={e => setSearch({ ...search, destination: e.target.value })}
+          className="border border-gray-300 p-2 w-full mb-3 rounded focus:outline-none focus:ring-2 focus:ring-secondary"
+          aria-label="Search destination"
+        />
+        <button
+          onClick={onSearch}
+          className="bg-secondary text-white px-4 py-2 rounded hover:bg-green-700 transition"
+        >
+          Search
+        </button>
+      </div>
+    );
+
+    const RideList = ({ rides, loading }) => (
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Available Rides</h2>
+        {loading ? (
+          <p className="text-gray-600">Loading rides...</p>
+        ) : rides.length === 0 ? (
+          <p className="text-gray-600">No rides available.</p>
+        ) : (
+          rides.map((ride) => (
+            <div key={ride.id} className="border rounded-lg p-4 mb-3 bg-white shadow-sm">
+              <p><strong>From:</strong> {ride.location}</p>
+              <p><strong>To:</strong> {ride.destination}</p>
+              <p><strong>Seats:</strong> {ride.seats}</p>
+              {ride.isZakaah && <p className="text-secondary font-semibold">Zakaah Ride 🌟</p>}
+            </div>
+          ))
+        )
+      </div>
+    );
+
+    const WaselApp = () => {
+      const [rides, setRides] = useState([]);
+      const [form, setForm] = useState({
+        location: '',
+        destination: '',
+        seats: '',
+        isZakaah: false,
+      });
+      const [search, setSearch] = useState({ location: '', destination: '' });
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState(null);
+
+      const fetchRides = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await axios.get(`${API_BASE_URL}/`);
+          setRides(response.data);
+        } catch (err) {
+          setError('Failed to fetch rides. Please try again.');
+          console.error('Fetch error:', err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        fetchRides();
+      }, []);
+
+      const handlePost = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          await axios.post(`${API_BASE_URL}/`, form);
+          setForm({ location: '', destination: '', seats: '', isZakaah: false });
+          fetchRides();
+        } catch (err) {
+          setError('Failed to post ride. Please try again.');
+          console.error('Post error:', err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const handleSearch = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await axios.get(`${API_BASE_URL}/`, { params: search });
+          setRides(response.data);
+        } catch (err) {
+          setError('Search failed. Please try again.');
+          console.error('Search error:', err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="p-6 max-w-2xl mx-auto bg-gray-100 min-h-screen">
+          <h1 className="text-3xl font-bold mb-6 text-center text-primary">🚗 Wasel App</h1>
+          <RideForm onSubmit={handlePost} form={form} setForm={setForm} error={error} />
+          <SearchForm onSearch={handleSearch} search={search} setSearch={setSearch} />
+          <RideList rides={rides} loading={loading} />
+        </div>
+      );
+    };
+
+    ReactDOM.render(<Wasel App />, document.getElementById('root'));
+  </script>
+</body>
 </html>
